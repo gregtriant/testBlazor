@@ -1,0 +1,59 @@
+﻿@page "/weather"
+@attribute [StreamRendering]
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+<p>This component demonstrates showing data.</p>
+
+@if (forecasts == null)
+{
+    <MudGrid xs="12" Class="d-flex align-center justify-start mud-width-full py-4">
+        <MudItem>
+            @* <p><em>Loading...</em></p> *@
+        </MudItem>
+        <MudItem>
+            <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+        </MudItem>
+    </MudGrid>
+}
+else
+{
+    <MudTable T="WeatherData" Dense="false" Bordered="true" Items="@forecasts" Hover="true" Breakpoint="Breakpoint.Sm">
+        <HeaderContent>
+			<MudTh>#</MudTh>
+			<MudTh>Date</MudTh>
+			<MudTh>Temp. (C)</MudTh>
+			<MudTh>Temp. (F)</MudTh>
+			<MudTh>Summary</MudTh>
+        </HeaderContent>
+		<RowTemplate>
+			<MudTd>@context.Index</MudTd>
+			<MudTd>@context.Date.ToShortDateString()</MudTd>
+			<MudTd>@context.TemperatureC</MudTd>
+			<MudTd>@context.TemperatureF</MudTd>
+			<MudTd>@context.Summary</MudTd>
+		</RowTemplate>
+    </MudTable>
+}
+
+@code {
+    private WeatherData[]? forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+
+        var startDate = DateOnly.FromDateTime(DateTime.Now);
+        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherData
+        {
+			Index = index,
+            Date = startDate.AddDays(index),
+            TemperatureC = Random.Shared.Next(-20, 55),
+            Summary = summaries[Random.Shared.Next(summaries.Length)]
+        }).ToArray();
+    }
+}

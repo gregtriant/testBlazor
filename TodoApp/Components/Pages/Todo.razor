@@ -1,0 +1,70 @@
+﻿@page "/todo"
+@rendermode InteractiveServer
+
+<PageTitle>Todo</PageTitle>
+
+<h3>My Todos</h3>
+
+<MudGrid xs="12" Class="d-flex align-center py-5">
+    <MudItem xs="5">
+        <MudTextField @bind-Value="newTodo" Label="Add new todo" Variant="Variant.Filled"></MudTextField>
+    </MudItem>
+    <MudItem xs="5">
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="AddTodo">Add new todo</MudButton>
+    </MudItem>
+</MudGrid>
+
+@foreach (var todo in todos)
+{
+    <MudGrid xs="12" Class="d-flex align-center py-1">
+        <MudItem>
+        @if (selectedTodoId == todo.Id)
+        {
+            <MudTextField id="" @bind-Value="todo.Title" Variant="Variant.Text" FullWidth="false" @onfocusout="() => ClickedElseWhere()"></MudTextField>
+        } else
+        {
+            <MudPaper style="min-height: 32px; width: 182px; display: flex; align-items: center;" Elevation="3" Outlined="true" @onclick="() => ClickedTodo(todo)">
+                 @todo.Title
+            </MudPaper>
+        }
+        </MudItem>
+        <MudItem Class="px-0">
+            <MudCheckBox @bind-Value="todo.IsDone" Color="Color.Secondary"></MudCheckBox>
+        </MudItem>
+        <MudItem Class="px-0">
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Inherit" Edge="Edge.Start" OnClick="() => RemoveTodo(todo)" />
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    private List<TodoItem> todos = new();
+    private string? newTodo { get; set; }
+    private Guid selectedTodoId { get; set; }
+
+    private void AddTodo()
+    {
+        if(!string.IsNullOrWhiteSpace(newTodo))
+        {
+            Guid id = Guid.NewGuid();
+            todos.Add(new TodoItem { Id = id, Title = newTodo });
+            newTodo = string.Empty;
+        }
+    }
+
+    private void RemoveTodo(TodoItem todo)
+    {
+        todos = todos.Where(td => td.Id != todo.Id).ToList();
+    }
+
+    private void ClickedTodo(TodoItem todo)
+    {
+        selectedTodoId = todo.Id;
+    }
+
+    private void ClickedElseWhere()
+    {
+        Console.WriteLine("Helloo");
+        selectedTodoId = Guid.Empty;
+    }
+}
